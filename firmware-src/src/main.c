@@ -1,50 +1,85 @@
 #include "mgos.h"
 #include "mgos_bswitch.h"
+#include "mgos_bbutton.h"
 #include "mgos_bthing_gpio.h"
 
-//$bthings/bThing-ABB28C/switch3/state
-//$bthings/bThing-ABB28C/switch3/set
+static mgos_bswitch_t s_relay1 = NULL;
+static mgos_bbsensor_t s_sw1 = NULL;
 
-static int gpio_pin1 = 5;   //Wemos D1
-static int gpio_pin2 = 4;   //Wemos D2
-static int gpio_pin3 = 12;  //Wemos D7
-static int gpio_pin4 = 13;  //Wemos D6
+#define EDDY_RELAY_PAYLOAD_ON        "ON"
+#define EDDY_RELAY_PAYLOAD_OFF       "OFF"
 
-static void switch_state_changed_cb(int ev, void *ev_data, void *userdata) {
-  mgos_bthing_t thing = MGOS_BSWITCH_THINGCAST((mgos_bswitch_t)ev_data);
+#define EDDY_SW_PAYLOAD_ON          "CLOSED"
+#define EDDY_SW_PAYLOAD_OFF         "OPEN"
 
-  mgos_bvarc_t state = mgos_bthing_get_state(thing);
-  if (mgos_bvar_is_changed(state)) {
-    const char *id = mgos_bthing_get_id(thing);
-    if (mgos_bvar_get_type(state) == MGOS_BVAR_TYPE_BOOL) {
-      LOG(LL_INFO, ("The '%s' has been switched %d", id, mgos_bvar_get_bool(state)));
-    } else {
-      LOG(LL_INFO, ("The '%s' has been switched %s", id, mgos_bvar_get_str(state)));
+#define EDDY_RELAY1_PIN              5
+#define EDDY_RELAY1_PIN_ACTIVE_HIGH  true
+#define EDDY_RELAY1_GPIO_PULL_TYPE   MGOS_GPIO_PULL_UP
+
+#define EDDY_SW1_PIN                 14
+#define EDDY_SW1_PIN_ACTIVE_HIGH     false
+#define EDDY_SW1_GPIO_PULL_TYPE      MGOS_GPIO_PULL_UP
+
+enum mg_eddy_sw_mode {
+  MG_EDDY_SW_MODE_DETACHED = 0,
+  MG_EDDY_SW_MODE_DASHBUTTON = 1,
+  MG_EDDY_SW_MODE_PUSH_TOGGLE = 2,
+  MG_EDDY_SW_MODE_EDGE_TOGGLE = 4,
+};
+
+void mg_eddy_sw_state_changed(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata) {
+  mgos_bbsensor_t sw = (mgos_bbsensor_t)thing;
+  enum mg_eddy_sw_mode mode = MG_EDDY_SW_MODE_DETACHED;
+  if (sw == s_sw1) {
+    mode = mgos_sys_config_get_eddy_sw1_mode();
+  }
+
+  bool bool_state;
+  if (mgos_bbsensor_state_parse(sw, state, &bool_state)) {
+    switch (mode) {
+      case MG_EDDY_SW_MODE_PUSH_TOGGLE:
+        /* code */
+        break;
+      case MG_EDDY_SW_MODE_EDGE_TOGGLE:
+        /* code */
+        break;
+      default:
+        break;
     }
   }
+
+  (void) userdata;
 }
 
 enum mgos_app_init_result mgos_app_init(void) {
-  mgos_event_add_handler(MGOS_EV_BTHING_STATE_CHANGED, switch_state_changed_cb, NULL);
+  NULL;
 
-  // create the switch #1
-  mgos_bswitch_t sw1 = mgos_bswitch_create("switch1", MGOS_BSWITCH_NO_GROUP, MGOS_BSWITCH_DEFAULT_SWITCHING_TIME);
-  mgos_bthing_gpio_attach_ex(MGOS_BSWITCH_THINGCAST(sw1), gpio_pin1, true, MGOS_GPIO_PULL_UP);
+  // create and initialize the relay #1
+  s_relay1 = mgos_bswitch_create(mgos_sys_config_get_eddy_relay1_id(),
+    MGOS_BSWITCH_NO_GROUP, MGOS_BSWITCH_DEFAULT_SWITCHING_TIME);
+  mgos_bthing_gpio_attach_ex(MGOS_BSWITCH_THINGCAST(s_relay1),
+    EDDY_RELAY1_PIN, EDDY_RELAY1_PIN_ACTIVE_HIGH, EDDY_RELAY1_GPIO_PULL_TYPE);
+  mgos_bbsensor_set_verbose_state(MGOS_BSWITCH_SENSCAST(s_relay1),
+    EDDY_RELAY_PAYLOAD_ON, EDDY_RELAY_PAYLOAD_OFF);
+  if (mgos_sys_config_get_eddy_relay1_inching_timeout() > 0) {
+    mgos_bswitch_set_inching(s_relay1, (mgos_sys_config_get_eddy_relay1_inching_timeout() * 1000), false);
+  }
 
-  // create the switch #2
-  mgos_bswitch_t sw2 = mgos_bswitch_create("switch2", MGOS_BSWITCH_NO_GROUP, MGOS_BSWITCH_DEFAULT_SWITCHING_TIME);
-  mgos_bbsensor_enable_str_state(MGOS_BSWITCH_SENSCAST(sw2), "ON", "OFF");
-  mgos_bthing_gpio_attach_ex(MGOS_BSWITCH_THINGCAST(sw2), gpio_pin2, true, MGOS_GPIO_PULL_UP);
-  mgos_bswitch_set_inching(sw2, 1000, true);
-
-  // create the switch #3 and #4 (group 1)
-  mgos_bswitch_t sw3 = mgos_bswitch_create("switch3", 1, MGOS_BSWITCH_DEFAULT_SWITCHING_TIME);
-  mgos_bbsensor_enable_str_state(MGOS_BSWITCH_SENSCAST(sw3), "ON", "OFF");
-  mgos_bthing_gpio_attach_ex(MGOS_BSWITCH_THINGCAST(sw3), gpio_pin3, true, MGOS_GPIO_PULL_UP);
-  // create the switch #4 (group 1)
-  mgos_bswitch_t sw4 = mgos_bswitch_create("switch4", 1, MGOS_BSWITCH_DEFAULT_SWITCHING_TIME);
-  mgos_bbsensor_enable_str_state(MGOS_BSWITCH_SENSCAST(sw4), "ON", "OFF");
-  mgos_bthing_gpio_attach_ex(MGOS_BSWITCH_THINGCAST(sw4), gpio_pin4, true, MGOS_GPIO_PULL_UP);
+  // create and initialize the switch #1
+  if (mgos_sys_config_get_eddy_sw1_mode() == MG_EDDY_SW_MODE_DASHBUTTON) {
+    mgos_bbutton_t sw = mgos_bbutton_create(mgos_sys_config_get_eddy_sw1_id());
+    mgos_bthing_gpio_attach_ex(MGOS_BBUTTON_THINGCAST(sw), EDDY_SW1_PIN,
+      EDDY_SW1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE);
+  } else {
+    s_sw1 = mgos_bbsensor_create(mgos_sys_config_get_eddy_sw1_id());
+    mgos_bbsensor_set_verbose_state(s_sw1, EDDY_SW_PAYLOAD_ON, EDDY_SW_PAYLOAD_OFF);
+    mgos_bthing_gpio_attach(MGOS_BBSENSOR_THINGCAST(s_sw1), EDDY_SW1_PIN, false);
+    mgos_bsensor_set_interrupt(MGOS_BBSENSOR_DOWNCAST(s_sw1),
+      EDDY_SW1_PIN, EDDY_SW1_GPIO_PULL_TYPE, MGOS_GPIO_INT_EDGE_ANY, 50);
+    if (mgos_sys_config_get_eddy_sw1_mode() != MG_EDDY_SW_MODE_DETACHED) {
+      mgos_bthing_on_state_changed(MGOS_BBSENSOR_THINGCAST(s_sw1), mg_eddy_sw_state_changed, NULL);
+    }
+  }
 
   return MGOS_APP_INIT_SUCCESS;
 }

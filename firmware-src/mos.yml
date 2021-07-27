@@ -8,19 +8,47 @@ modules_version: ${mos.version}
 mongoose_os_version: ${mos.version}
 
 config_schema:
-  - ["mqtt.server", "iot.eclipse.org:1883"]
-  - ["i2c.enable", true]
+  - ["mqtt.enable", true]
+  - ["mqtt.ssl_ca_cert", "ca.pem"]
+  - ["mqtt.will_topic", "$eddies/${device_id}/availability"]
+  - ["bthing.mqtt.state_updated_topic", "$eddies/${device_id}/${bthing_id}/state/updated"]
+  - ["bthing.mqtt.set_state_topic", "$eddies/${device_id}/${bthing_id}/state/set"]
+  - ["bthing.mqtt.get_state_topic", "$eddies/${device_id}/${bthing_id}/state/get"]
+
+  - ["eddy", "o", {title: "Eddy's settings"}]
+  - ["eddy.relay1", "o", {title: "Relay's settings"}]
+  - ["eddy.relay1.id", "s", "relay1", {title: "The relay ID"}]
+  - ["eddy.relay1.inching_timeout", "i", 0, {title: "The inching timeout, in seconds; default is 0 (inching disabled)."}]
+  - ["eddy.sw1", "o", {title: "Switch's settings"}]
+  - ["eddy.sw1.id", "s", "sw1", {title: "The siwtch ID"}]
+  - ["eddy.sw1.mode", "i", 1, {title: "The siwtch mode"}]
 
 tags:
   - c
-  - eddy s1
+  - eddy-s1
+
+sources:
+  - src
+
+includes:
+  - include
 
 filesystem:
   - fs
 
 libs:
   - location: https://github.com/mongoose-os-libs/boards
-  - location: https://github.com/mongoose-os-libs/js-demo-bundle
+  - location: https://github.com/mongoose-os-libs/ca-bundle
+  - location: https://github.com/mongoose-os-libs/wifi
+  - location: https://github.com/mongoose-os-libs/rpc-common
+  - location: https://github.com/mongoose-os-libs/rpc-uart
+  - location: https://github.com/mongoose-os-libs/rpc-service-config
+  - location: https://github.com/diy365-mgos/bthing-gpio
+  - location: https://github.com/diy365-mgos/bvar-json
+  - location: https://github.com/diy365-mgos/bthing-shadow
+  - location: https://github.com/diy365-mgos/bthing-mqtt
+  - location: https://github.com/diy365-mgos/bswitch
+  - location: https://github.com/diy365-mgos/bbutton
 
 conds:
   - when: mos.platform == "esp32"
