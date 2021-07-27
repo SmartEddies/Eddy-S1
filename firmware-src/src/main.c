@@ -74,7 +74,7 @@ enum mgos_app_init_result mgos_app_init(void) {
     s_sw1 = mgos_bbsensor_create(mgos_sys_config_get_eddy_sw1_id());
     mgos_bbsensor_set_verbose_state(s_sw1, EDDY_SW_PAYLOAD_ON, EDDY_SW_PAYLOAD_OFF);
     mgos_bthing_gpio_attach(MGOS_BBSENSOR_THINGCAST(s_sw1), EDDY_SW1_PIN, false);
-    mgos_bsensor_set_interrupt(MGOS_BBSENSOR_DOWNCAST(s_sw1),
+    mgos_bsensor_update_on_int(MGOS_BBSENSOR_DOWNCAST(s_sw1),
       EDDY_SW1_PIN, EDDY_SW1_GPIO_PULL_TYPE, MGOS_GPIO_INT_EDGE_ANY, 50);
     if (mgos_sys_config_get_eddy_sw1_mode() != MG_EDDY_SW_MODE_DETACHED) {
       mgos_bthing_on_state_changed(MGOS_BBSENSOR_THINGCAST(s_sw1), mg_eddy_sw_state_changed, NULL);
