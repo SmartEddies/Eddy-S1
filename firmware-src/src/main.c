@@ -71,9 +71,9 @@ enum mgos_app_init_result mgos_app_init(void) {
 
   // create and initialize the switch #1
   if (mgos_sys_config_get_eddy_sw1_mode() == MG_EDDY_SW_MODE_DASHBUTTON) {
-    mgos_bbutton_t sw = mgos_bbutton_create(mgos_sys_config_get_eddy_sw1_id());
-    mgos_bsensor_update_on_int(MGOS_BBUTTON_THINGCAST(sw),
-      EDDY_SW1_PIN, EDDY_SW1_GPIO_PULL_TYPE, MGOS_GPIO_INT_EDGE_ANY, 50);
+    mgos_bbutton_t btn = mgos_bbutton_create(mgos_sys_config_get_eddy_sw1_id());
+    mgos_bthing_gpio_attach(MGOS_BBUTTON_THINGCAST(btn), EDDY_SW1_PIN,
+      EDDY_SW1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE);
   } else {
     s_sw1 = mgos_bbsensor_create(mgos_sys_config_get_eddy_sw1_id());
     mgos_bbsensor_set_verbose_state(s_sw1, EDDY_SW_PAYLOAD_ON, EDDY_SW_PAYLOAD_OFF);
