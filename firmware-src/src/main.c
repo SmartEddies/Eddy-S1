@@ -27,21 +27,25 @@ enum mg_eddy_sw_mode {
   MG_EDDY_SW_MODE_EDGE_TOGGLE = 4,
 };
 
-void mg_eddy_sw_state_changed(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata) {
-  mgos_bbsensor_t sw = (mgos_bbsensor_t)thing;
+static void mg_eddy_sw_state_changed(struct mgos_bthing_state_changed_arg *args, void *userdata) {
+  if (args->state_init) return;
+
+  mgos_bbsensor_t sw = (mgos_bbsensor_t)args->thing;
   enum mg_eddy_sw_mode mode = MG_EDDY_SW_MODE_DETACHED;
   if (sw == s_sw1) {
     mode = mgos_sys_config_get_eddy_sw1_mode();
   }
 
   bool bool_state;
-  if (mgos_bbsensor_state_parse(sw, state, &bool_state)) {
+  if (mgos_bbsensor_state_parse(sw, args->state, &bool_state)) {
     switch (mode) {
       case MG_EDDY_SW_MODE_PUSH_TOGGLE:
-        /* code */
+        if (bool_state) {
+          mgos_bbactuator_toggle_state(s_relay1);
+        }
         break;
       case MG_EDDY_SW_MODE_EDGE_TOGGLE:
-        /* code */
+        mgos_bbactuator_toggle_state(s_relay1);
         break;
       default:
         break;
@@ -68,15 +72,15 @@ enum mgos_app_init_result mgos_app_init(void) {
   // create and initialize the switch #1
   if (mgos_sys_config_get_eddy_sw1_mode() == MG_EDDY_SW_MODE_DASHBUTTON) {
     mgos_bbutton_t sw = mgos_bbutton_create(mgos_sys_config_get_eddy_sw1_id());
-    mgos_bthing_gpio_attach(MGOS_BBUTTON_THINGCAST(sw), EDDY_SW1_PIN,
-      EDDY_SW1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE);
+    mgos_bsensor_update_on_int(MGOS_BBUTTON_THINGCAST(sw),
+      EDDY_SW1_PIN, EDDY_SW1_GPIO_PULL_TYPE, MGOS_GPIO_INT_EDGE_ANY, 50);
   } else {
     s_sw1 = mgos_bbsensor_create(mgos_sys_config_get_eddy_sw1_id());
     mgos_bbsensor_set_verbose_state(s_sw1, EDDY_SW_PAYLOAD_ON, EDDY_SW_PAYLOAD_OFF);
     mgos_bsensor_update_on_int(MGOS_BBSENSOR_DOWNCAST(s_sw1),
       EDDY_SW1_PIN, EDDY_SW1_GPIO_PULL_TYPE, MGOS_GPIO_INT_EDGE_ANY, 50);
     mgos_bthing_gpio_attach(MGOS_BBSENSOR_THINGCAST(s_sw1), EDDY_SW1_PIN,
-      EDDY_SW1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE), ;
+      EDDY_SW1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE);
     if (mgos_sys_config_get_eddy_sw1_mode() != MG_EDDY_SW_MODE_DETACHED) {
       mgos_bthing_on_state_changed(MGOS_BBSENSOR_THINGCAST(s_sw1), mg_eddy_sw_state_changed, NULL);
     }
