@@ -21,7 +21,7 @@ config_schema:
   - ["eddy.relay1.inching_timeout", "i", 0, {title: "The inching timeout, in seconds; default is 0 (inching disabled)."}]
   - ["eddy.sw1", "o", {title: "Switch's settings"}]
   - ["eddy.sw1.id", "s", "sw1", {title: "The siwtch ID"}]
-  - ["eddy.sw1.mode", "i", 1, {title: "The siwtch mode"}]
+  - ["eddy.sw1.mode", "i", 3, {title: "The siwtch mode"}]
 
 tags:
   - c
