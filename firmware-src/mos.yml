@@ -8,10 +8,6 @@ modules_version: ${mos.version}
 mongoose_os_version: ${mos.version}
 
 config_schema:
-  - ["mqtt.server", "192.168.1.254:8883"]
-  - ["mqtt.user", "gaojing@hotmail.it"]
-  - ["mqtt.pass", "Marika2414"]
-
   - ["mqtt.enable", true]
   - ["mqtt.ssl_ca_cert", "ca.pem"]
   - ["mqtt.will_topic", "$eddies/${device_id}/availability"]
