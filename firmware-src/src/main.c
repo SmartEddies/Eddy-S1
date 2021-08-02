@@ -12,24 +12,22 @@ static mgos_bbsensor_t s_sw1 = NULL;
 #define EDDY_SW_PAYLOAD_ON          "CLOSED"
 #define EDDY_SW_PAYLOAD_OFF         "OPEN"
 
-#define EDDY_RELAY1_PIN              5
+#define EDDY_RELAY1_PIN              5 // D1 on WEMOS D1 Mini shield
 #define EDDY_RELAY1_PIN_ACTIVE_HIGH  true
 #define EDDY_RELAY1_GPIO_PULL_TYPE   MGOS_GPIO_PULL_UP
 
-#define EDDY_SW1_PIN                 14
+#define EDDY_SW1_PIN                 0 // D3 on WEMOS D1 Mini shield
 #define EDDY_SW1_PIN_ACTIVE_HIGH     false
 #define EDDY_SW1_GPIO_PULL_TYPE      MGOS_GPIO_PULL_UP
 
 enum mg_eddy_sw_mode {
-  MG_EDDY_SW_MODE_DETACHED = 0,
-  MG_EDDY_SW_MODE_DASHBUTTON = 1,
-  MG_EDDY_SW_MODE_PUSH_TOGGLE = 2,
-  MG_EDDY_SW_MODE_EDGE_TOGGLE = 4,
+  MG_EDDY_SW_MODE_DASH_BUTTON = 0,
+  MG_EDDY_SW_MODE_DETACHED = 1,
+  MG_EDDY_SW_MODE_TOGGLE_ON_PUSH = 2,
+  MG_EDDY_SW_MODE_TOGGLE_ON_EDGE = 3
 };
 
 static void mg_eddy_sw_state_changed(struct mgos_bthing_state_changed_arg *args, void *userdata) {
-  if (args->state_init) return;
-
   mgos_bbsensor_t sw = (mgos_bbsensor_t)args->thing;
   enum mg_eddy_sw_mode mode = MG_EDDY_SW_MODE_DETACHED;
   if (sw == s_sw1) {
@@ -39,12 +37,13 @@ static void mg_eddy_sw_state_changed(struct mgos_bthing_state_changed_arg *args,
   bool bool_state;
   if (mgos_bbsensor_state_parse(sw, args->state, &bool_state)) {
     switch (mode) {
-      case MG_EDDY_SW_MODE_PUSH_TOGGLE:
+      case MG_EDDY_SW_MODE_TOGGLE_ON_PUSH:
         if (bool_state) {
           mgos_bbactuator_toggle_state(s_relay1);
         }
         break;
-      case MG_EDDY_SW_MODE_EDGE_TOGGLE:
+      case MG_EDDY_SW_MODE_TOGGLE_ON_EDGE:
+        if (!args->state_init || (args->state_init && bool_state))
         mgos_bbactuator_toggle_state(s_relay1);
         break;
       default:
@@ -56,8 +55,6 @@ static void mg_eddy_sw_state_changed(struct mgos_bthing_state_changed_arg *args,
 }
 
 enum mgos_app_init_result mgos_app_init(void) {
-  NULL;
-
   // create and initialize the relay #1
   s_relay1 = mgos_bswitch_create(mgos_sys_config_get_eddy_relay1_id(),
     MGOS_BSWITCH_NO_GROUP, MGOS_BSWITCH_DEFAULT_SWITCHING_TIME);
@@ -70,7 +67,7 @@ enum mgos_app_init_result mgos_app_init(void) {
   }
 
   // create and initialize the switch #1
-  if (mgos_sys_config_get_eddy_sw1_mode() == MG_EDDY_SW_MODE_DASHBUTTON) {
+  if (mgos_sys_config_get_eddy_sw1_mode() == MG_EDDY_SW_MODE_DASH_BUTTON) {
     mgos_bbutton_t btn = mgos_bbutton_create(mgos_sys_config_get_eddy_sw1_id());
     mgos_bthing_gpio_attach(MGOS_BBUTTON_THINGCAST(btn), EDDY_SW1_PIN,
       EDDY_SW1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE);

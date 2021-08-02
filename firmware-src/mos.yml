@@ -8,9 +8,14 @@ modules_version: ${mos.version}
 mongoose_os_version: ${mos.version}
 
 config_schema:
+  - ["mqtt.server", "192.168.1.254:8883"]
+  - ["mqtt.user", "gaojing@hotmail.it"]
+  - ["mqtt.pass", "Marika2414"]
+
   - ["mqtt.enable", true]
   - ["mqtt.ssl_ca_cert", "ca.pem"]
   - ["mqtt.will_topic", "$eddies/${device_id}/availability"]
+
   - ["bthing.mqtt.state_updated_topic", "$eddies/${device_id}/${bthing_id}/state/updated"]
   - ["bthing.mqtt.set_state_topic", "$eddies/${device_id}/${bthing_id}/state/set"]
   - ["bthing.mqtt.get_state_topic", "$eddies/${device_id}/${bthing_id}/state/get"]
@@ -21,7 +26,7 @@ config_schema:
   - ["eddy.relay1.inching_timeout", "i", 0, {title: "The inching timeout, in seconds; default is 0 (inching disabled)."}]
   - ["eddy.sw1", "o", {title: "Switch's settings"}]
   - ["eddy.sw1.id", "s", "sw1", {title: "The siwtch ID"}]
-  - ["eddy.sw1.mode", "i", 3, {title: "The siwtch mode"}]
+  - ["eddy.sw1.mode", "i", 3, {title: "The siwtch mode: 0(DASH_BUTTON), 1(DETACHED), 2(TOGGLE_ON_PUSH), 3(TOGGLE_ON_EDGE)"}]
 
 tags:
   - c
