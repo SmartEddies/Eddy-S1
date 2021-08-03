@@ -19,6 +19,7 @@ config_schema:
   - ["eddy", "o", {title: "Eddy's settings"}]
   - ["eddy.relay1", "o", {title: "Relay's settings"}]
   - ["eddy.relay1.id", "s", "relay1", {title: "The relay ID"}]
+  - ["eddy.relay1.grp_id", "i", 0, {title: "The relay gorup ID"}]
   - ["eddy.relay1.inching_timeout", "i", 0, {title: "The inching timeout, in seconds; default is 0 (inching disabled)."}]
   - ["eddy.sw1", "o", {title: "Switch's settings"}]
   - ["eddy.sw1.id", "s", "sw1", {title: "The siwtch ID"}]
@@ -39,6 +40,7 @@ filesystem:
 
 libs:
   - location: https://github.com/mongoose-os-libs/boards
+  - location: https://github.com/mongoose-os-libs/provision
   - location: https://github.com/mongoose-os-libs/ca-bundle
   - location: https://github.com/mongoose-os-libs/wifi
   - location: https://github.com/mongoose-os-libs/rpc-common

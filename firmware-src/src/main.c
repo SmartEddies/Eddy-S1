@@ -27,12 +27,16 @@ enum mg_eddy_sw_mode {
   MG_EDDY_SW_MODE_TOGGLE_ON_EDGE = 3
 };
 
+enum mg_eddy_sw_mode mg_eddy_get_sw_mode(mgos_bbsensor_t sw) {
+  if (sw == s_sw1) {
+    return  mgos_sys_config_get_eddy_sw1_mode();
+  }
+  return MG_EDDY_SW_MODE_DETACHED;
+}
+
 static void mg_eddy_sw_state_changed(struct mgos_bthing_state_changed_arg *args, void *userdata) {
   mgos_bbsensor_t sw = (mgos_bbsensor_t)args->thing;
-  enum mg_eddy_sw_mode mode = MG_EDDY_SW_MODE_DETACHED;
-  if (sw == s_sw1) {
-    mode = mgos_sys_config_get_eddy_sw1_mode();
-  }
+  enum mg_eddy_sw_mode mode = mg_eddy_get_sw_mode(sw);
 
   bool bool_state;
   if (mgos_bbsensor_state_parse(sw, args->state, &bool_state)) {
@@ -54,34 +58,69 @@ static void mg_eddy_sw_state_changed(struct mgos_bthing_state_changed_arg *args,
   (void) userdata;
 }
 
-enum mgos_app_init_result mgos_app_init(void) {
-  // create and initialize the relay #1
-  s_relay1 = mgos_bswitch_create(mgos_sys_config_get_eddy_relay1_id(),
-    MGOS_BSWITCH_NO_GROUP, MGOS_BSWITCH_DEFAULT_SWITCHING_TIME);
-  mgos_bthing_gpio_attach(MGOS_BSWITCH_THINGCAST(s_relay1),
-    EDDY_RELAY1_PIN, EDDY_RELAY1_PIN_ACTIVE_HIGH, EDDY_RELAY1_GPIO_PULL_TYPE);
-  mgos_bbsensor_set_verbose_state(MGOS_BSWITCH_SENSCAST(s_relay1),
-    EDDY_RELAY_PAYLOAD_ON, EDDY_RELAY_PAYLOAD_OFF);
-  if (mgos_sys_config_get_eddy_relay1_inching_timeout() > 0) {
-    mgos_bswitch_set_inching(s_relay1, (mgos_sys_config_get_eddy_relay1_inching_timeout() * 1000), false);
-  }
-
-  // create and initialize the switch #1
-  if (mgos_sys_config_get_eddy_sw1_mode() == MG_EDDY_SW_MODE_DASH_BUTTON) {
-    mgos_bbutton_t btn = mgos_bbutton_create(mgos_sys_config_get_eddy_sw1_id());
-    mgos_bthing_gpio_attach(MGOS_BBUTTON_THINGCAST(btn), EDDY_SW1_PIN,
-      EDDY_SW1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE);
-  } else {
-    s_sw1 = mgos_bbsensor_create(mgos_sys_config_get_eddy_sw1_id());
-    mgos_bbsensor_set_verbose_state(s_sw1, EDDY_SW_PAYLOAD_ON, EDDY_SW_PAYLOAD_OFF);
-    mgos_bsensor_update_on_int(MGOS_BBSENSOR_DOWNCAST(s_sw1),
-      EDDY_SW1_PIN, EDDY_SW1_GPIO_PULL_TYPE, MGOS_GPIO_INT_EDGE_ANY, 50);
-    mgos_bthing_gpio_attach(MGOS_BBSENSOR_THINGCAST(s_sw1), EDDY_SW1_PIN,
-      EDDY_SW1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE);
-    if (mgos_sys_config_get_eddy_sw1_mode() != MG_EDDY_SW_MODE_DETACHED) {
-      mgos_bthing_on_state_changed(MGOS_BBSENSOR_THINGCAST(s_sw1), mg_eddy_sw_state_changed, NULL);
+mgos_bswitch_t mg_eddy_init_bswitch(const char *id, int pin, bool active_high,
+                                    enum mgos_gpio_pull_type pull_type,
+                                    int grp_id, int inching_timeout) {
+  mgos_bswitch_t relay = mgos_bswitch_create(id, grp_id, MGOS_BSWITCH_DEFAULT_SWITCHING_TIME);
+  if (relay) {
+    mgos_bbsensor_set_verbose_state(MGOS_BSWITCH_SENSCAST(relay), EDDY_RELAY_PAYLOAD_ON, EDDY_RELAY_PAYLOAD_OFF);
+    if (mgos_bthing_gpio_attach(MGOS_BSWITCH_THINGCAST(relay), pin, active_high, pull_type)) {
+      if (inching_timeout == 0) return relay; // success
+      if (mgos_bswitch_set_inching(relay, (inching_timeout * 1000), false)) return relay; // success
     }
   }
+  return NULL; // something went wrong
+}
+
+mgos_bbsensor_t mg_eddy_init_bbsensor(const char *id, int pin, enum mg_eddy_sw_mode mode,
+                                      bool active_high, enum mgos_gpio_pull_type pull_type) {
+  if (mode == MG_EDDY_SW_MODE_DASH_BUTTON) {
+    mgos_bbutton_t btn = mgos_bbutton_create(id);
+    if (btn && mgos_bthing_gpio_attach(MGOS_BBUTTON_THINGCAST(btn), pin, active_high, pull_type)) {
+      return btn;
+    }
+
+  } else {
+    mgos_bbsensor_t sw = mgos_bbsensor_create(id);
+    mgos_bbsensor_set_verbose_state(sw, EDDY_SW_PAYLOAD_ON, EDDY_SW_PAYLOAD_OFF);
+    if (mgos_bsensor_update_on_int(MGOS_BBSENSOR_DOWNCAST(sw), pin, pull_type, MGOS_GPIO_INT_EDGE_ANY, 50) &&
+        mgos_bthing_gpio_attach(MGOS_BBSENSOR_THINGCAST(sw), pin, active_high, pull_type)){
+      if (mode != MG_EDDY_SW_MODE_DETACHED) {
+        mgos_bthing_on_state_changed(MGOS_BBSENSOR_THINGCAST(sw), mg_eddy_sw_state_changed, NULL); 
+      }
+      return sw; // success
+    }
+  }
+  return NULL; // something went wrong
+}
+
+bool mg_eddy_init_actuators() {
+  // create and initialize the relay #1
+  s_relay1 = mg_eddy_init_bswitch(mgos_sys_config_get_eddy_relay1_id(),
+     EDDY_RELAY1_PIN, EDDY_RELAY1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE,
+     mgos_sys_config_get_eddy_relay1_grp_id(),
+     mgos_sys_config_get_eddy_relay1_inching_timeout());
+  if (!s_relay1) return false;
+
+  return true; //success
+}
+
+bool mg_eddy_init_sensors() {
+  // create and initialize the switch #1
+  s_sw1 = mg_eddy_init_bbsensor(mgos_sys_config_get_eddy_sw1_id(),
+    EDDY_SW1_PIN, mgos_sys_config_get_eddy_sw1_mode(),
+    EDDY_SW1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE);
+  if (!s_sw1) return false;
+
+  return true; //success
+}
+
+enum mgos_app_init_result mgos_app_init(void) {
+  if (!mg_eddy_init_actuators())
+    return MGOS_APP_INIT_ERROR;
+
+  if (!mg_eddy_init_sensors())
+    return MGOS_APP_INIT_ERROR;
 
   return MGOS_APP_INIT_SUCCESS;
 }
