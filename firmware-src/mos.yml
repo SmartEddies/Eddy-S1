@@ -15,7 +15,7 @@ config_schema:
   - ["wifi.ap.pass", "Edd!es@h0me"]
 
   - ["mqtt.will_topic", "$eddies/${device_id}/LWT"]
-
+  - ["bthing.mqtt.ping_topic", "$eddies/${device_id}/ping"]
   - ["bthing.mqtt.state_updated_topic", "$eddies/${device_id}/${bthing_id}/state/updated"]
   - ["bthing.mqtt.set_state_topic", "$eddies/${device_id}/${bthing_id}/state/set"]
   - ["bthing.mqtt.get_state_topic", "$eddies/${device_id}/${bthing_id}/state/get"]
