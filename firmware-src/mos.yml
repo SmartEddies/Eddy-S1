@@ -10,8 +10,8 @@ mongoose_os_version: ${mos.version}
 config_schema: 
   - ["device.id", "EddyS1-??????"]
   
-  - ["wifi.ap.ssid": "EddyS1-??????"]
-  - ["wifi.ap.pass": "Edd!es@h0me"]
+  - ["wifi.ap.ssid", "EddyS1-??????"]
+  - ["wifi.ap.pass", "Edd!es@h0me"]
 
   - ["mqtt.will_topic", "$eddies/${device_id}/availability"]
 
