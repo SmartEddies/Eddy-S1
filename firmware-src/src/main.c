@@ -34,11 +34,13 @@ enum mg_eddy_sw_mode mg_eddy_get_sw_mode(mgos_bbsensor_t sw) {
   return MG_EDDY_SW_MODE_DETACHED;
 }
 
-static void mg_eddy_sw_state_changed(struct mgos_bthing_state_changed_arg *args, void *userdata) {
+static void mg_eddy_sw_state_changed(int ev, void *ev_data, void *userdata) {
+  struct mgos_bthing_state *args = (struct mgos_bthing_state *)ev_data;
   mgos_bbsensor_t sw = (mgos_bbsensor_t)args->thing;
   enum mg_eddy_sw_mode mode = mg_eddy_get_sw_mode(sw);
 
   bool bool_state;
+  bool state_init = ((args->state_flags & MGOS_BTHING_STATE_FLAG_INITIALIZING) == MGOS_BTHING_STATE_FLAG_INITIALIZING);
   if (mgos_bbsensor_state_parse(sw, args->state, &bool_state)) {
     switch (mode) {
       case MG_EDDY_SW_MODE_TOGGLE_ON_PUSH:
@@ -46,15 +48,16 @@ static void mg_eddy_sw_state_changed(struct mgos_bthing_state_changed_arg *args,
           mgos_bbactuator_toggle_state(s_relay1);
         }
         break;
-      case MG_EDDY_SW_MODE_TOGGLE_ON_EDGE:
-        if (!args->state_init || (args->state_init && bool_state))
-        mgos_bbactuator_toggle_state(s_relay1);
+      case MG_EDDY_SW_MODE_TOGGLE_ON_EDGE: 
+        if (!state_init || (state_init && bool_state)) {
+          mgos_bbactuator_toggle_state(s_relay1);
+        }
         break;
       default:
         break;
     }
   }
-
+  (void) ev;
   (void) userdata;
 }
 
@@ -86,7 +89,7 @@ mgos_bbsensor_t mg_eddy_init_bbsensor(const char *id, int pin, enum mg_eddy_sw_m
     if (mgos_bsensor_update_on_int(MGOS_BBSENSOR_DOWNCAST(sw), pin, pull_type, MGOS_GPIO_INT_EDGE_ANY, 50) &&
         mgos_bthing_gpio_attach(MGOS_BBSENSOR_THINGCAST(sw), pin, active_high, pull_type)){
       if (mode != MG_EDDY_SW_MODE_DETACHED) {
-        mgos_bthing_on_state_changed(MGOS_BBSENSOR_THINGCAST(sw), mg_eddy_sw_state_changed, NULL); 
+        mgos_bthing_on_event(MGOS_BBSENSOR_THINGCAST(sw), MGOS_EV_BTHING_STATE_CHANGED, mg_eddy_sw_state_changed, NULL); 
       }
       return sw; // success
     }

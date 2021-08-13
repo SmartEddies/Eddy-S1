@@ -7,9 +7,8 @@ libs_version: ${mos.version}
 modules_version: ${mos.version}
 mongoose_os_version: ${mos.version}
 
-config_schema:
-  - ["mqtt.enable", true]
-  - ["mqtt.ssl_ca_cert", "ca.pem"]
+config_schema: 
+  - ["device.id", "Eddy-S1-??????"]
   - ["mqtt.will_topic", "$eddies/${device_id}/availability"]
 
   - ["bthing.mqtt.state_updated_topic", "$eddies/${device_id}/${bthing_id}/state/updated"]
@@ -41,11 +40,13 @@ filesystem:
 libs:
   - location: https://github.com/mongoose-os-libs/boards
   - location: https://github.com/mongoose-os-libs/provision
-  - location: https://github.com/mongoose-os-libs/ca-bundle
   - location: https://github.com/mongoose-os-libs/wifi
   - location: https://github.com/mongoose-os-libs/rpc-common
-  - location: https://github.com/mongoose-os-libs/rpc-uart
   - location: https://github.com/mongoose-os-libs/rpc-service-config
+  - location: https://github.com/mongoose-os-libs/rpc-uart
+  - location: https://github.com/mongoose-os-libs/rpc-ws
+  - location: https://github.com/mongoose-os-libs/dash
+  - location: https://github.com/mongoose-os-libs/wifi-setup-web-ui
   - location: https://github.com/diy365-mgos/bthing-gpio
   - location: https://github.com/diy365-mgos/bvar-json
   - location: https://github.com/diy365-mgos/bthing-shadow
