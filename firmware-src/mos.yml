@@ -2,7 +2,7 @@ author: DIY-365
 name: Eddy-S1
 description: Eddy-S1 firmware
 # arch: PLATFORM
-version: 1.0
+version: 1.1
 manifest_version: 2017-05-18
 libs_version: ${mos.version}
 modules_version: ${mos.version}
@@ -14,7 +14,7 @@ config_schema:
   - ["wifi.ap.ssid", "EddyS1-??????"]
   - ["wifi.ap.pass", "Edd!es@h0me"]
 
-  - ["mqtt.will_topic", "$eddies/${device_id}/availability"]
+  - ["mqtt.will_topic", "$eddies/${device_id}/LWT"]
 
   - ["bthing.mqtt.state_updated_topic", "$eddies/${device_id}/${bthing_id}/state/updated"]
   - ["bthing.mqtt.set_state_topic", "$eddies/${device_id}/${bthing_id}/state/set"]
