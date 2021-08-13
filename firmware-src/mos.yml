@@ -8,7 +8,11 @@ modules_version: ${mos.version}
 mongoose_os_version: ${mos.version}
 
 config_schema: 
-  - ["device.id", "Eddy-S1-??????"]
+  - ["device.id", "EddyS1-??????"]
+  
+  - ["wifi.ap.ssid": "EddyS1-??????"]
+  - ["wifi.ap.pass": "Edd!es@h0me"]
+
   - ["mqtt.will_topic", "$eddies/${device_id}/availability"]
 
   - ["bthing.mqtt.state_updated_topic", "$eddies/${device_id}/${bthing_id}/state/updated"]
