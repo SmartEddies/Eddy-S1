@@ -47,10 +47,9 @@ libs:
   - location: https://github.com/mongoose-os-libs/wifi
   - location: https://github.com/mongoose-os-libs/rpc-common
   - location: https://github.com/mongoose-os-libs/rpc-service-config
+  - location: https://github.com/mongoose-os-libs/rpc-service-ota
   - location: https://github.com/mongoose-os-libs/rpc-uart
-  - location: https://github.com/mongoose-os-libs/http-server
   - location: https://github.com/mongoose-os-libs/dash
-  - location: https://github.com/mongoose-os-libs/wifi-setup-web-ui
   - location: https://github.com/diy365-mgos/bthing-gpio
   - location: https://github.com/diy365-mgos/bvar-json
   - location: https://github.com/diy365-mgos/bthing-shadow
