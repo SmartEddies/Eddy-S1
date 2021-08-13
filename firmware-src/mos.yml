@@ -1,5 +1,6 @@
 author: DIY-365
-description: Eddy S1 firmware
+name: Eddy-S1
+description: Eddy-S1 firmware
 # arch: PLATFORM
 version: 1.0
 manifest_version: 2017-05-18
@@ -48,6 +49,7 @@ libs:
   - location: https://github.com/mongoose-os-libs/rpc-common
   - location: https://github.com/mongoose-os-libs/rpc-service-config
   - location: https://github.com/mongoose-os-libs/rpc-service-ota
+  - location: https://github.com/mongoose-os-libs/rpc-service-fs
   - location: https://github.com/mongoose-os-libs/rpc-uart
   - location: https://github.com/mongoose-os-libs/dash
   - location: https://github.com/diy365-mgos/bthing-gpio
