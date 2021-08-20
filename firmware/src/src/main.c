@@ -66,7 +66,7 @@ static void mg_eddy_sw_state_changed(int ev, void *ev_data, void *userdata) {
 
 mgos_bswitch_t mg_eddy_init_bswitch(const char *id, int pin, bool active_high,
                                     enum mgos_gpio_pull_type pull_type,
-                                    int grp_id, int inching_timeout) {
+                                    int grp_id, double inching_timeout, bool inching_lock) {
   mgos_bswitch_t relay = mgos_bswitch_create(id, grp_id,
     MGOS_BSWITCH_DEFAULT_SWITCHING_TIME, EDDY_RELAY_DOMAIN_NAME);
   if (relay) {
@@ -110,7 +110,8 @@ bool mg_eddy_init_actuators() {
   s_relay1 = mg_eddy_init_bswitch(mgos_sys_config_get_eddy_relay1_id(),
      EDDY_RELAY1_PIN, EDDY_RELAY1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE,
      mgos_sys_config_get_eddy_relay1_grp_id(),
-     mgos_sys_config_get_eddy_relay1_inching_timeout());
+     mgos_sys_config_get_eddy_relay1_inching_timeout(),
+     mgos_sys_config_get_eddy_relay1_inching_lock());
   if (!s_relay1) return false;
 
   return true; //success
