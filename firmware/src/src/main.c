@@ -12,6 +12,9 @@ static mgos_bbsensor_t s_sw1 = NULL;
 #define EDDY_SW_PAYLOAD_ON          "CLOSED"
 #define EDDY_SW_PAYLOAD_OFF         "OPEN"
 
+#define EDDY_RELAY_DOMAIN_NAME      "relays"
+#define EDDY_SW_DOMAIN_NAME         "switches"
+
 #define EDDY_RELAY1_PIN              5 // D1 on WEMOS D1 Mini shield
 #define EDDY_RELAY1_PIN_ACTIVE_HIGH  true
 #define EDDY_RELAY1_GPIO_PULL_TYPE   MGOS_GPIO_PULL_UP
@@ -64,12 +67,14 @@ static void mg_eddy_sw_state_changed(int ev, void *ev_data, void *userdata) {
 mgos_bswitch_t mg_eddy_init_bswitch(const char *id, int pin, bool active_high,
                                     enum mgos_gpio_pull_type pull_type,
                                     int grp_id, int inching_timeout) {
-  mgos_bswitch_t relay = mgos_bswitch_create(id, grp_id, MGOS_BSWITCH_DEFAULT_SWITCHING_TIME);
+  mgos_bswitch_t relay = mgos_bswitch_create(id, grp_id,
+    MGOS_BSWITCH_DEFAULT_SWITCHING_TIME, EDDY_RELAY_DOMAIN_NAME);
   if (relay) {
+    mgos_bthing_t thing = MGOS_BSWITCH_THINGCAST(relay);
     mgos_bbsensor_set_verbose_state(MGOS_BSWITCH_SENSCAST(relay), EDDY_RELAY_PAYLOAD_ON, EDDY_RELAY_PAYLOAD_OFF);
-    if (mgos_bthing_gpio_attach(MGOS_BSWITCH_THINGCAST(relay), pin, active_high, pull_type)) {
+    if (mgos_bthing_gpio_attach(thing, pin, active_high, pull_type)) {
       if (inching_timeout == 0) return relay; // success
-      if (mgos_bswitch_set_inching(relay, (inching_timeout * 1000), false)) return relay; // success
+      if (mgos_bswitch_set_inching(relay, (inching_timeout * 1000), true)) return relay; // success
     }
   }
   return NULL; // something went wrong
@@ -78,20 +83,23 @@ mgos_bswitch_t mg_eddy_init_bswitch(const char *id, int pin, bool active_high,
 mgos_bbsensor_t mg_eddy_init_bbsensor(const char *id, int pin, enum mg_eddy_sw_mode mode,
                                       bool active_high, enum mgos_gpio_pull_type pull_type) {
   if (mode == MG_EDDY_SW_MODE_DASH_BUTTON) {
-    mgos_bbutton_t btn = mgos_bbutton_create(id);
+    mgos_bbutton_t btn = mgos_bbutton_create(id, EDDY_SW_DOMAIN_NAME);
     if (btn && mgos_bthing_gpio_attach(MGOS_BBUTTON_THINGCAST(btn), pin, active_high, pull_type)) {
       return btn;
     }
 
   } else {
-    mgos_bbsensor_t sw = mgos_bbsensor_create(id);
-    mgos_bbsensor_set_verbose_state(sw, EDDY_SW_PAYLOAD_ON, EDDY_SW_PAYLOAD_OFF);
-    if (mgos_bsensor_update_on_int(MGOS_BBSENSOR_DOWNCAST(sw), pin, pull_type, MGOS_GPIO_INT_EDGE_ANY, 50) &&
-        mgos_bthing_gpio_attach(MGOS_BBSENSOR_THINGCAST(sw), pin, active_high, pull_type)){
-      if (mode != MG_EDDY_SW_MODE_DETACHED) {
-        mgos_bthing_on_event(MGOS_BBSENSOR_THINGCAST(sw), MGOS_EV_BTHING_STATE_CHANGED, mg_eddy_sw_state_changed, NULL); 
+    mgos_bbsensor_t sw = mgos_bbsensor_create(id, EDDY_SW_DOMAIN_NAME);
+    if (sw) {
+      mgos_bthing_t thing = MGOS_BBSENSOR_THINGCAST(sw);
+      mgos_bbsensor_set_verbose_state(sw, EDDY_SW_PAYLOAD_ON, EDDY_SW_PAYLOAD_OFF);
+      if (mgos_bsensor_update_on_int(MGOS_BBSENSOR_DOWNCAST(sw), pin, pull_type, MGOS_GPIO_INT_EDGE_ANY, 50) &&
+          mgos_bthing_gpio_attach(thing, pin, active_high, pull_type)) {
+        if (mode != MG_EDDY_SW_MODE_DETACHED) {
+          mgos_bthing_on_event(thing, MGOS_EV_BTHING_STATE_CHANGED, mg_eddy_sw_state_changed, NULL); 
+        }
+        return sw; // success
       }
-      return sw; // success
     }
   }
   return NULL; // something went wrong

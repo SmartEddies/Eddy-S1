@@ -14,19 +14,15 @@ config_schema:
   - ["wifi.ap.ssid", "EddyS1-??????"]
   - ["wifi.ap.pass", "Edd!es@h0me"]
 
-  - ["mqtt.will_topic", "$eddies/${device_id}/LWT"]
-  - ["bthing.mqtt.ping_topic", "$eddies/${device_id}/ping"]
-  - ["bthing.mqtt.state_updated_topic", "$eddies/${device_id}/${bthing_id}/state/updated"]
-  - ["bthing.mqtt.set_state_topic", "$eddies/${device_id}/${bthing_id}/state/set"]
-  - ["bthing.mqtt.get_state_topic", "$eddies/${device_id}/${bthing_id}/state/get"]
+  - ["bthing.mqtt.topic_dom", "$eddies"]
 
   - ["eddy", "o", {title: "Eddy's settings"}]
   - ["eddy.relay1", "o", {title: "Relay's settings"}]
-  - ["eddy.relay1.id", "s", "relay1", {title: "The relay ID"}]
+  - ["eddy.relay1.id", "s", "0", {title: "The relay ID"}]
   - ["eddy.relay1.grp_id", "i", 0, {title: "The relay gorup ID"}]
   - ["eddy.relay1.inching_timeout", "i", 0, {title: "The inching timeout, in seconds; default is 0 (inching disabled)."}]
   - ["eddy.sw1", "o", {title: "Switch's settings"}]
-  - ["eddy.sw1.id", "s", "sw1", {title: "The siwtch ID"}]
+  - ["eddy.sw1.id", "s", "0", {title: "The siwtch ID"}]
   - ["eddy.sw1.mode", "i", 3, {title: "The siwtch mode: 0(DASH_BUTTON), 1(DETACHED), 2(TOGGLE_ON_PUSH), 3(TOGGLE_ON_EDGE)"}]
 
 tags:
