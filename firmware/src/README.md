@@ -17,5 +17,5 @@ The library adds the `eddy` section to the device configuration:
   }
 }
 ```
-## To Dd
+## To Do
 *No improvememts scheduled.*
