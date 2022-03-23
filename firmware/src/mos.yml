@@ -14,7 +14,7 @@ config_schema:
   - ["wifi.ap.ssid", "EddyS1-??????"]
   - ["wifi.ap.pass", "Edd!es@h0me"]
 
-  - ["bthing.mqtt.topic_dom", "$eddies"]
+  - ["bthing.mqtt.topic_prefix", "$eddies"]
 
   - ["eddy", "o", {title: "Eddy's settings"}]
   - ["eddy.relay1", "o", {title: "Relay's settings"}]
