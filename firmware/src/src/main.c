@@ -4,7 +4,7 @@
 #include "mgos_bthing_gpio.h"
 
 static mgos_bswitch_t s_relay1 = NULL;
-static mgos_bbsensor_t s_sw1 = NULL;
+static mgos_bbinsens_t s_sw1 = NULL;
 
 #define EDDY_RELAY_PAYLOAD_ON        "ON"
 #define EDDY_RELAY_PAYLOAD_OFF       "OFF"
@@ -30,7 +30,7 @@ enum mg_eddy_sw_mode {
   MG_EDDY_SW_MODE_TOGGLE_ON_EDGE = 3
 };
 
-enum mg_eddy_sw_mode mg_eddy_get_sw_mode(mgos_bbsensor_t sw) {
+enum mg_eddy_sw_mode mg_eddy_get_sw_mode(mgos_bbinsens_t sw) {
   if (sw == s_sw1) {
     return  mgos_sys_config_get_eddy_sw1_mode();
   }
@@ -39,21 +39,21 @@ enum mg_eddy_sw_mode mg_eddy_get_sw_mode(mgos_bbsensor_t sw) {
 
 static void mg_eddy_sw_state_changed(int ev, void *ev_data, void *userdata) {
   struct mgos_bthing_state *args = (struct mgos_bthing_state *)ev_data;
-  mgos_bbsensor_t sw = (mgos_bbsensor_t)args->thing;
+  mgos_bbinsens_t sw = (mgos_bbinsens_t)args->thing;
   enum mg_eddy_sw_mode mode = mg_eddy_get_sw_mode(sw);
 
   bool bool_state;
   bool state_init = ((args->state_flags & MGOS_BTHING_STATE_FLAG_INITIALIZING) == MGOS_BTHING_STATE_FLAG_INITIALIZING);
-  if (mgos_bbsensor_state_parse(sw, args->state, &bool_state)) {
+  if (mgos_bbinsens_state_parse(sw, args->state, &bool_state)) {
     switch (mode) {
       case MG_EDDY_SW_MODE_TOGGLE_ON_PUSH:
         if (bool_state) {
-          mgos_bbactuator_toggle_state(s_relay1);
+          mgos_bbinactu_toggle_state(s_relay1);
         }
         break;
       case MG_EDDY_SW_MODE_TOGGLE_ON_EDGE: 
         if (!state_init || (state_init && bool_state)) {
-          mgos_bbactuator_toggle_state(s_relay1);
+          mgos_bbinactu_toggle_state(s_relay1);
         }
         break;
       default:
@@ -71,7 +71,7 @@ mgos_bswitch_t mg_eddy_init_bswitch(const char *id, int pin, bool active_high,
     MGOS_BSWITCH_DEFAULT_SWITCHING_TIME, EDDY_RELAY_DOMAIN_NAME);
   if (relay) {
     mgos_bthing_t thing = MGOS_BSWITCH_THINGCAST(relay);
-    mgos_bbsensor_set_verbose_state(MGOS_BSWITCH_SENSCAST(relay), EDDY_RELAY_PAYLOAD_ON, EDDY_RELAY_PAYLOAD_OFF);
+    mgos_bbinsens_set_verbose_state(MGOS_BSWITCH_SENSCAST(relay), EDDY_RELAY_PAYLOAD_ON, EDDY_RELAY_PAYLOAD_OFF);
     if (mgos_bthing_gpio_attach(thing, pin, active_high, pull_type)) {
       if (inching_timeout == 0) return relay; // success
       if (mgos_bswitch_set_inching(relay, (inching_timeout * 1000), true)) return relay; // success
@@ -80,7 +80,7 @@ mgos_bswitch_t mg_eddy_init_bswitch(const char *id, int pin, bool active_high,
   return NULL; // something went wrong
 }
 
-mgos_bbsensor_t mg_eddy_init_bbsensor(const char *id, int pin, enum mg_eddy_sw_mode mode,
+mgos_bbinsens_t mg_eddy_init_bbinsens(const char *id, int pin, enum mg_eddy_sw_mode mode,
                                       bool active_high, enum mgos_gpio_pull_type pull_type) {
   if (mode == MG_EDDY_SW_MODE_DASH_BUTTON) {
     mgos_bbutton_t btn = mgos_bbutton_create(id, EDDY_SW_DOMAIN_NAME);
@@ -89,11 +89,11 @@ mgos_bbsensor_t mg_eddy_init_bbsensor(const char *id, int pin, enum mg_eddy_sw_m
     }
 
   } else {
-    mgos_bbsensor_t sw = mgos_bbsensor_create(id, EDDY_SW_DOMAIN_NAME);
+    mgos_bbinsens_t sw = mgos_bbinsens_create(id, EDDY_SW_DOMAIN_NAME);
     if (sw) {
-      mgos_bthing_t thing = MGOS_BBSENSOR_THINGCAST(sw);
-      mgos_bbsensor_set_verbose_state(sw, EDDY_SW_PAYLOAD_ON, EDDY_SW_PAYLOAD_OFF);
-      if (mgos_bsensor_update_on_int(MGOS_BBSENSOR_DOWNCAST(sw), pin, pull_type, MGOS_GPIO_INT_EDGE_ANY, 50) &&
+      mgos_bthing_t thing = MGOS_BBINSENS_THINGCAST(sw);
+      mgos_bbinsens_set_verbose_state(sw, EDDY_SW_PAYLOAD_ON, EDDY_SW_PAYLOAD_OFF);
+      if (mgos_bsensor_update_on_int(MGOS_BBINSENS_DOWNCAST(sw), pin, pull_type, MGOS_GPIO_INT_EDGE_ANY, 50) &&
           mgos_bthing_gpio_attach(thing, pin, active_high, pull_type)) {
         if (mode != MG_EDDY_SW_MODE_DETACHED) {
           mgos_bthing_on_event(thing, MGOS_EV_BTHING_STATE_CHANGED, mg_eddy_sw_state_changed, NULL); 
@@ -119,7 +119,7 @@ bool mg_eddy_init_actuators() {
 
 bool mg_eddy_init_sensors() {
   // create and initialize the switch #1
-  s_sw1 = mg_eddy_init_bbsensor(mgos_sys_config_get_eddy_sw1_id(),
+  s_sw1 = mg_eddy_init_bbinsens(mgos_sys_config_get_eddy_sw1_id(),
     EDDY_SW1_PIN, mgos_sys_config_get_eddy_sw1_mode(),
     EDDY_SW1_PIN_ACTIVE_HIGH, EDDY_SW1_GPIO_PULL_TYPE);
   if (!s_sw1) return false;
