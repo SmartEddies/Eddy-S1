@@ -18,4 +18,4 @@ The library adds the `eddy` section to the device configuration:
 }
 ```
 ## To Do
-*No improvememts scheduled.*
+*No improvements scheduled.*
