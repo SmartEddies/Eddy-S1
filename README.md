@@ -12,10 +12,18 @@ This is the functional schema of Eddy S1.
 Connect your Eddy-S1 to your PC using a USB cable.
 ### 3. Upload the latest firmware
 Download the [latest firmware](../../releases/latest/download/fw.zip) and flash it typing on a terminal:
+
 `mos flash fw.zip --port SERIAL_PORT` 
-### 4. Configure WiFi connection
+### 4. Configure the WiFi connection
 Connect your device to your WiFi typing on a terminal:
-`mos wifi WIFI_NETWORK_NAME WIFI_PASSWOR`
+
+`mos wifi WIFI_NETWORK_NAME WIFI_PASSWORD`
+### 5. Configure the MQTT connection
+Connect your device to your MQTT broker typing on a terminal:
+
+`mos wifi WIFI_NETWORK_NAME WIFI_PASSWORD`
+
+
 
 1. Connect your PC to the Eddy S1 using an USB cable or WiFi
 2. Set the button mode (optional)
