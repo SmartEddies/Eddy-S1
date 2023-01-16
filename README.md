@@ -9,19 +9,28 @@ This is the functional schema of Eddy S1.
 ### 1. Download and install mos tool
 [Download](https://mongoose-os.com/docs/mongoose-os/quickstart/setup.md#1-download-and-install-mos-tool) and install `mos` tool.
 ### 2. Connect the device to your PC
-Connect your Eddy-S1 to your PC using a USB cable.
+Connect your device to your PC using a USB cable.
 ### 3. Upload the latest firmware
-Download the [latest firmware](../../releases/latest/download/fw.zip) and flash it typing on a terminal:
+Download the [latest firmware](../../releases/latest/download/fw.zip) and flash it typing the following command on a terminal.
 
-`mos flash fw.zip --port SERIAL_PORT` 
+`mos flash fw.zip` 
 ### 4. Configure the WiFi connection
-Connect your device to your WiFi typing on a terminal:
+Connect your device to your local WiFi network. Type the following command on a terminal.
 
 `mos wifi WIFI_NETWORK_NAME WIFI_PASSWORD`
 ### 5. Configure the MQTT connection
-Connect your device to your MQTT broker typing on a terminal:
+Connect your device to your MQTT broker. Type the following commands on a terminal according your broker authentication and protocol settings.
 
-`mos wifi WIFI_NETWORK_NAME WIFI_PASSWORD`
+Set username and password if your broker requires them.
+
+`mos config-set mqtt.user=USERNAME mqtt.pass=PASSWORD`
+
+Disable SSL communiation if your broker doesn't support it.
+
+`mos config-set mqtt.ssl_ca_cert=`
+
+Set the server to connect to. If no PORT is specified, 1883 or 8883 is used depending on whether SSL is enabled.
+`mos config-set mqtt.enable=true mqtt.server=MQTT_BROKER`
 
 
 
