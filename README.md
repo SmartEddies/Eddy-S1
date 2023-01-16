@@ -7,10 +7,15 @@ This is the functional schema of Eddy S1.
 ![eddy-s1 functional schema](docs/eddy-s1_functional_schema.jpg)
 ## GET STARTED
 ### 1. Download and install mos tool
-[Download](https://mongoose-os.com/docs/mongoose-os/quickstart/setup.md#1-download-and-install-mos-tool) and install `mos` tool. 
-### 2. Upload the latest firmware
-Download the [latest firmware](../../releases/latest/download/fw.zip), connect your Eddy-S1 to your PC using a USB cable and flash the firmware typing `mos flash fw.zip --port SERIAL_PORT` on a terminal.
-
+[Download](https://mongoose-os.com/docs/mongoose-os/quickstart/setup.md#1-download-and-install-mos-tool) and install `mos` tool.
+### 2. Connect the device to your PC
+Connect your Eddy-S1 to your PC using a USB cable.
+### 3. Upload the latest firmware
+Download the [latest firmware](../../releases/latest/download/fw.zip) and flash it typing on a terminal:
+`mos flash fw.zip --port SERIAL_PORT` 
+### 4. Configure WiFi connection
+Connect your device to your WiFi typing on a terminal:
+`mos wifi WIFI_NETWORK_NAME WIFI_PASSWOR`
 
 1. Connect your PC to the Eddy S1 using an USB cable or WiFi
 2. Set the button mode (optional)
