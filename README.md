@@ -1,11 +1,17 @@
-# Eddy S1   
+# Eddy-S1   
 ## Smart, powerful and cheap DIY WiFi switch
-Eddy S1 is a smart, powerful and cheap WiFi switch based on a [Mongoose OS](https://mongoose-os.com/) firmware. It can be easily integrated with your home automation system using MQTT protocol.
+Eddy-S1 is a smart, powerful and cheap WiFi switch based on a [Mongoose OS](https://mongoose-os.com/) firmware. It can be easily integrated with your home automation system using MQTT protocol.
 ## Functional schema
 This is the functional schema of Eddy S1.
 
 ![eddy-s1 functional schema](docs/eddy-s1_functional_schema.jpg)
 ## GET STARTED
+### 1. Download and install mos tool
+[Download](https://mongoose-os.com/docs/mongoose-os/quickstart/setup.md#1-download-and-install-mos-tool) and install `mos` tool. 
+### 2. Upload the latest firwmare
+Download the leates firmware, connect your Eddy-S1 to your PC using a USB cable and flash the firmware typing `mos flash https://mdash.net/downloads/ccm/ccm.esp32.zip --port SERIAL_PORT` on a terminal.
+
+
 1. Connect your PC to the Eddy S1 using an USB cable or WiFi
 2. Set the button mode (optional)
 3. Set the relay inching mode (optional)
