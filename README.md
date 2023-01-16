@@ -1,7 +1,8 @@
 # Eddy S1   
 ## Smart, powerful and cheap DIY WiFi switch
-Eddy S1 is a smart, powerful and cheap WiFi switch based on [Mongoose OS](https://mongoose-os.com/). It can be easily integrated with your home automation system using MQTT protocol.
-
+Eddy S1 is a smart, powerful and cheap WiFi switch based on a [Mongoose OS](https://mongoose-os.com/) firmware. It can be easily integrated with your home automation system using MQTT protocol.
+## Functional schema
+This is the functional schema of Eddy S1. 
 ![eddy-s1 functional schema](docs/eddy-s1_functional_schema.jpg)
 ## GET STARTED
 1. Connect your PC to the Eddy S1 using an USB cable or WiFi
