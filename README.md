@@ -25,9 +25,9 @@ Disable SSL communiation if your broker doesn't support it.
 
 `mos config-set mqtt.ssl_ca_cert=`
 
-Set the server to connect to. If no PORT is specified, 1883 or 8883 is used depending on whether SSL is enabled.
+Set the server to connect to. If `:PORT` is not specified, 1883 or 8883 is used depending on whether SSL is enabled.
 
-`mos config-set mqtt.enable=true mqtt.server=MQTT_BROKER`
+`mos config-set mqtt.enable=true mqtt.server=BROKER_HOST:PORT`
 ### 5. Configure the WiFi connection
 Connect your device to your local WiFi network. Type the following command on a terminal.
 
