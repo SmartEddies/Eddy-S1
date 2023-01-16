@@ -14,11 +14,7 @@ Connect your device to your PC using a USB cable.
 Download the [latest firmware](../../releases/latest/download/fw.zip) and flash it typing the following command on a terminal.
 
 `mos flash fw.zip` 
-### 4. Configure the WiFi connection
-Connect your device to your local WiFi network. Type the following command on a terminal.
-
-`mos wifi WIFI_NETWORK_NAME WIFI_PASSWORD`
-### 5. Configure the MQTT connection
+### 4. Configure the MQTT connection
 Connect your device to your MQTT broker. Type the following commands on a terminal according your broker authentication and protocol settings.
 
 Set username and password if your broker requires them.
@@ -30,7 +26,12 @@ Disable SSL communiation if your broker doesn't support it.
 `mos config-set mqtt.ssl_ca_cert=`
 
 Set the server to connect to. If no PORT is specified, 1883 or 8883 is used depending on whether SSL is enabled.
+
 `mos config-set mqtt.enable=true mqtt.server=MQTT_BROKER`
+### 5. Configure the WiFi connection
+Connect your device to your local WiFi network. Type the following command on a terminal.
+
+`mos wifi WIFI_NETWORK_NAME WIFI_PASSWORD`
 
 
 
