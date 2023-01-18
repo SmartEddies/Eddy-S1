@@ -21,29 +21,14 @@ Set username and password if your broker requires them.
 
 `mos config-set mqtt.user=USERNAME mqtt.pass=PASSWORD`
 
-Disable SSL communiation if your broker doesn't support it.
+Set the MQTT broker name/address to connect to. If `:PORT` is not specified, 1883 or 8883 is used depending on whether SSL is enabled.
 
-`mos config-set mqtt.ssl_ca_cert=`
-
-Set the server to connect to. If `:PORT` is not specified, 1883 or 8883 is used depending on whether SSL is enabled.
-
-`mos config-set mqtt.enable=true mqtt.server=BROKER_HOST:PORT`
+`mos config-set mqtt.enable=true mqtt.server=MQTT_BROKER:PORT`
 ### 5. Configure the WiFi connection
 Connect your device to your local WiFi network. Type the following command on a terminal.
 
 `mos wifi WIFI_NETWORK_NAME WIFI_PASSWORD`
-
-
-
-1. Connect your PC to the Eddy S1 using an USB cable or WiFi
-2. Set the button mode (optional)
-3. Set the relay inching mode (optional)
-4. Set [mDash](https://mdash.net/) connection (optional)
-5. Set MQTT connection
-6. Connect Eddy S1 to your WiFi
-## Connect your PC to the Eddy S1
-Connect your PC to the Eddy S1 to start the initial configuration or to update it. You can establish the connection in two ways:
-## Set the button mode
+### 6. Set the button mode (optional)
 The B1 button supports 4 different modes:
 |Mode|||
 |--|--|--|
@@ -51,3 +36,15 @@ The B1 button supports 4 different modes:
 |1|DETACHED|The button is detached and it doesn't change the relay's status.|
 |2|TOGGLE_ON_PUSH|The button toggle the relay's status every time it is presed(closed) and then released(open).|
 |3|TOGGLE_ON_EDGE|The button toggle the relay's status every time it is presed(closed) or released(open). This is the defualt mode.|
+
+Type the following command on a terminal.
+
+`mos config-set eddy.sw1.mode=MODE`
+### 7. Set the relay inching timeout (optional)
+Set the relay's inching timeout in seconds. The defualt value `0` means the inching is disabled. Type the following command on a terminal.
+
+`mos config-set eddy.relay1.inching_timeout=TIMEOUT`
+### 8. Connect the devide to mDash (optional)
+[Add the device to the mDash management dashboard](https://mongoose-os.com/docs/mongoose-os/quickstart/setup.md#8-add-device-to-the-mdash-management-dashboard) and type the following command on a terminal to enable the [mDash](https://mdash.net/) connection.
+
+`mos config-set dash.enable=true dash.token=TOKEN`
