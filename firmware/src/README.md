@@ -9,7 +9,7 @@ The library adds the `eddy` section to the device configuration:
     "id": "0",              // The relay ID
     "grp_id": 0,            // The relay gorup ID
     "inching_timeout": 0.0, // The inching timeout, in seconds; default is 0 (inching disabled)
-    "inching_lock": false,  // Lock the state waiting for the inching timeout expiration
+    "inching_lock": true,  // Lock the state waiting for the inching timeout expiration
   },
   "sw1": {
     "id": "0",              // The siwtch ID"

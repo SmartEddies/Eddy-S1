@@ -21,7 +21,7 @@ config_schema:
   - ["eddy.relay1.id", "s", "0", {title: "The relay ID"}]
   - ["eddy.relay1.grp_id", "i", 0, {title: "The relay gorup ID"}]
   - ["eddy.relay1.inching_timeout", "d", 0.0, {title: "The inching timeout, in seconds; default is 0 (inching disabled)"}]
-  - ["eddy.relay1.inching_lock", "b", false, {title: "Lock the state waiting for the inching timeout expiration"}]
+  - ["eddy.relay1.inching_lock", "b", true, {title: "Lock the state waiting for the inching timeout expiration"}]
   - ["eddy.sw1", "o", {title: "Switch's settings"}]
   - ["eddy.sw1.id", "s", "0", {title: "The switch ID"}]
   - ["eddy.sw1.mode", "i", 3, {title: "The switch mode: 0(DASH_BUTTON), 1(DETACHED), 2(TOGGLE_ON_PUSH), 3(TOGGLE_ON_EDGE)"}]

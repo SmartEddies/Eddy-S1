@@ -43,18 +43,16 @@ static void mg_eddy_sw_state_changed(int ev, void *ev_data, void *userdata) {
   enum mg_eddy_sw_mode mode = mg_eddy_get_sw_mode(sw);
 
   bool bool_state;
-  bool state_init = ((args->state_flags & MGOS_BTHING_STATE_FLAG_INITIALIZING) == MGOS_BTHING_STATE_FLAG_INITIALIZING);
-  if (mgos_bbinsens_state_parse(sw, args->state, &bool_state)) {
+  bool state_init = ((args->state_flags & MGOS_BTHING_STATE_FLAG_INITIALIZED) == MGOS_BTHING_STATE_FLAG_INITIALIZED);
+  if (!state_init && mgos_bbinsens_state_parse(sw, args->state, &bool_state) && bool_state) {
     switch (mode) {
       case MG_EDDY_SW_MODE_TOGGLE_ON_PUSH:
-        if (bool_state) {
-          mgos_bbinactu_toggle_state(s_relay1);
-        }
+        //LOG(LL_INFO, ("mgos_bbinactu_toggle_state(MG_EDDY_SW_MODE_TOGGLE_ON_PUSH)"));
+        mgos_bbinactu_toggle_state(s_relay1);
         break;
       case MG_EDDY_SW_MODE_TOGGLE_ON_EDGE: 
-        if (!state_init || (state_init && bool_state)) {
-          mgos_bbinactu_toggle_state(s_relay1);
-        }
+        //LOG(LL_INFO, ("mgos_bbinactu_toggle_state(MG_EDDY_SW_MODE_TOGGLE_ON_EDGE)"));
+        mgos_bbinactu_toggle_state(s_relay1);
         break;
       default:
         break;
@@ -74,7 +72,7 @@ mgos_bswitch_t mg_eddy_init_bswitch(const char *id, int pin, bool active_high,
     mgos_bbinsens_set_verbose_state(MGOS_BSWITCH_SENSCAST(relay), EDDY_RELAY_PAYLOAD_ON, EDDY_RELAY_PAYLOAD_OFF);
     if (mgos_bthing_gpio_attach(thing, pin, active_high, pull_type)) {
       if (inching_timeout == 0) return relay; // success
-      if (mgos_bswitch_set_inching(relay, (inching_timeout * 1000), true)) return relay; // success
+      if (mgos_bswitch_set_inching(relay, (inching_timeout * 1000), inching_lock)) return relay; // success
     }
   }
   return NULL; // something went wrong
