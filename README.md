@@ -48,3 +48,5 @@ Set the relay's inching timeout in seconds. The defualt value `0` means the inch
 [Add the device to the mDash management dashboard](https://mongoose-os.com/docs/mongoose-os/quickstart/setup.md#8-add-device-to-the-mdash-management-dashboard) and type the following command on a terminal to enable the [mDash](https://mdash.net/) connection.
 
 `mos config-set dash.enable=true dash.token=TOKEN`
+## To Do
+*No improvements scheduled.*
