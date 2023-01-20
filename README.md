@@ -34,8 +34,8 @@ The B1 button supports 4 different modes:
 |--|--|--|
 |0|DASH_BUTTON|The button runs like a [dash button](https://github.com/diy365-mgos/bbutton) raising [events](https://github.com/diy365-mgos/bbutton/blob/master/README.md#mgos_bbutton_event), but without changing the relay's status.|
 |1|DETACHED|The button is detached and it doesn't change the relay's status.|
-|2|TOGGLE_ON_PUSH|The button toggle the relay's status every time it is presed(closed) and then released(open).|
-|3|TOGGLE_ON_EDGE|The button toggle the relay's status every time it is presed(closed) or released(open). This is the defualt mode.|
+|2|TOGGLE_ON_PUSH|The button toggles the relay's status every time it is presed and then released.|
+|3|TOGGLE_ON_EDGE|The button toggles the relay's status every time it is presed or released. This is the defualt mode.|
 
 Type the following command on a terminal.
 
